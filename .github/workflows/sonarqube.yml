@@ -1,0 +1,35 @@
+name: SonarQube Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download SonarScanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
+          unzip sonar-scanner.zip
+
+      - name: Run SonarScanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./sonar-scanner-5.0.1.3006/bin/sonar-scanner \
+            -Dsonar.projectKey=sonar-ngrok-demo \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://f5e9-200-124-51-71.ngrok-free.app/ \
+            -Dsonar.login=$SONAR_TOKEN
